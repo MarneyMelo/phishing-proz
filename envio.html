@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envio de Documentos - Proz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- RESET E ESTRUTURA BÁSICA --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { height: 100%; font-family: 'Roboto', sans-serif; background-color: #f4f4f9; }
+        
+        /* Fundo com imagem */
+        .bg-container {
+            background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .bg-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 1;
+        }
+        
+        /* Container Principal */
+        .card-box {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Cabeçalho */
+        .header-section { text-align: center; margin-bottom: 25px; }
+        .header-section img { max-width: 140px; height: auto; margin-bottom: 15px; }
+        .header-section h2 { color: #563486; font-size: 20px; font-weight: 700; }
+
+        /* Badge CPF */
+        .cpf-badge {
+            background-color: #eaddff;
+            color: #563486;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 30px;
+            border: 1px solid #d0bcff;
+        }
+
+        /* Lista de Documentos */
+        .docs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .doc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .doc-item:hover { border-color: #563486; background-color: #fff; }
+
+        /* ESTILO DE ERRO (NOVO) */
+        .doc-item.error {
+            border-color: #dc3545; /* Vermelho */
+            background-color: #fff5f5;
+        }
+        .doc-item.error .doc-label { color: #dc3545; }
+
+        .doc-info { display: flex; flex-direction: column; }
+        .doc-label { font-size: 14px; font-weight: 700; color: #444; margin-bottom: 2px; }
+        .doc-status { font-size: 12px; color: #888; }
+
+        input[type="file"] { display: none; }
+        
+        .upload-btn {
+            background-color: #fff;
+            color: #563486;
+            border: 1px solid #563486;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .upload-btn:hover { background-color: #563486; color: #fff; }
+        
+        /* Estilo Selecionado */
+        .file-selected .upload-btn {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        .file-selected .doc-status { color: #28a745; font-weight: bold; }
+        .file-selected { border-color: #28a745 !important; background-color: #f0fff4 !important; }
+
+        /* Botão Enviar */
+        .submit-all-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 6px;
+            background-color: #563486;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .submit-all-btn:hover { background-color: #452a6b; }
+
+        /* Mensagem de Erro Geral */
+        #error-alert {
+            display: none;
+            color: #dc3545;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        #final-msg {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-container">
+        <div class="bg-overlay"></div>
+        
+        <div class="card-box">
+            
+            <div class="header-section">
+                <img src="proz2.jpg" alt="Logo Proz">
+                <h2>Envio de Pendências</h2>
+            </div>
+
+            <div class="cpf-badge">
+                CPF: <span id="display-cpf">Carregando...</span>
+            </div>
+
+            <form action="aviso.html" method="GET" onsubmit="return finalizarEnvio(event)">
+                <div class="docs-list">
+                    
+                    <div class="doc-item" id="item-rg-frente">
+                        <div class="doc-info">
+                            <span class="doc-label">RG / CNH (Frente) *</span>
+                            <span class="doc-status" id="status-rg-frente">Obrigatório</span>
+                        </div>
+                        <label for="file-rg-frente" class="upload-btn">
+                            Anexar
+                        </label>
+                        <input type="file" id="file-rg-frente" onchange="updateStatus(this, 'rg-frente')">
+                    </div>
+
+                    <div class="doc-item" id="item-rg-verso">
+                        <div class="doc-info">
+                            <span class="doc-label">RG / CNH (Verso) *</span>
+                            <span class="doc-status" id="status-rg-verso">Obrigatório</span>
+                        </div>
+                        <label for="file-rg-verso" class="upload-btn">
+                            Anexar
+                        </label>
+                        <input type="file" id="file-rg-verso" onchange="updateStatus(this, 'rg-verso')">
+                    </div>
+
+                </div>
+
+                <div id="error-alert" style="display: none; color: red; margin: 15px 0;">
+                    ⚠️ Por favor, anexe a frente e o verso do documento.
+                </div>
+
+                <button type="submit" class="submit-all-btn">Enviar Documentos</button>
+            </form>
+
+            <div id="final-msg">
+                <strong>Sucesso!</strong><br>
+                Seus documentos foram enviados para análise.
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. Carrega CPF
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const cpf = params.get('cpf');
+            document.getElementById('display-cpf').textContent = cpf ? cpf : "Não informado";
+        }
+
+        // Função para atualizar o status visual quando o arquivo é escolhido
+        function updateStatus(input, tipo) {
+            // Pega o elemento span do status (ex: status-rg-frente)
+            const statusSpan = document.getElementById('status-' + tipo);
+            const itemDiv = document.getElementById('item-' + tipo);
+
+            if (input.files && input.files.length > 0) {
+                // Se tem arquivo
+                statusSpan.innerText = "Anexado ✅";
+                statusSpan.style.color = "green";
+                itemDiv.style.border = "1px solid green"; // Opcional: destaque visual
+            } else {
+                // Se removeu o arquivo
+                statusSpan.innerText = "Obrigatório";
+                statusSpan.style.color = "black"; // ou a cor original
+                itemDiv.style.border = "none";
+            }
+        }
+
+        // Função que roda ao clicar em Enviar
+        function finalizarEnvio(event) {
+            const fileFrente = document.getElementById('file-rg-frente');
+            const fileVerso = document.getElementById('file-rg-verso');
+            const errorAlert = document.getElementById('error-alert');
+
+            // Verifica se ambos os inputs possuem arquivos
+            if (fileFrente.files.length === 0 || fileVerso.files.length === 0) {
+                // Se faltar algum arquivo:
+                event.preventDefault(); // IMPEDE o redirecionamento para aviso.html
+                errorAlert.style.display = 'block'; // Mostra o erro
+                return false;
+            }
+
+            // Se chegou aqui, está tudo certo.
+            // O form vai seguir o 'action="aviso.html"' naturalmente.
+            return true; 
+        }
+    </script>
+
+</body>
+</html>

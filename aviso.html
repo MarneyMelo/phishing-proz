@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALERTA DE SEGURANÇA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #8a1f1f; /* Vermelho escuro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            background-color: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 90%;
+            border: 5px solid #ff0000;
+        }
+
+        h1 {
+            color: #d8000c;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .alert-icon {
+            font-size: 80px;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .safe-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <span class="alert-icon">🛑</span>
+        <h1>Cuidado!</h1>
+        <h2>VOCÊ ACABA DE CAIR EM UM PHISHING.</h2>
+        
+        <p>Este site não é oficial da Proz. Em um cenário real, seus documentos teriam sido roubados.</p>
+        <p>Nome completo, CPF, e foto do seu RG poderiam estar em perigo.</p>
+        <p>Fique sempre atendo no domínio do site e, antes de enviar os documentos, busque se informar se isso realmente é necessário e oficial.</p>
+
+        <div class="safe-message">
+            ✅ FIQUE TRANQUILO!<br>
+            Somos alunos da turma de Desenvolvimento de Sistemas.<br>
+            Seus dados e arquivos NÃO foram armazenados e estão seguros.
+        </div>
+
+        <div class="footer">
+            Trabalho acadêmico de Engenharia Social
+        </div>
+    </div>
+
+</body>
+</html>
